@@ -25,7 +25,7 @@ function showProducts(){
         
         console.log('\r\n\n\n***WELCOME TO bAMAzON!****'.rainbow + '\r\n');
         startBamazon();
-        console.log('\r\nAvailable Products for Purchase:'.inverse.magenta+'\r\n');
+        console.log('\r\nAvailable Products for Purchase:'.inverse.cyan.underline+'\r\n');
         console.table(res);
         
     })
@@ -37,7 +37,7 @@ function startBamazon(){
     .prompt({
         name: 'askID',
         type: 'input',
-        message: "Enter the Product ID of the product you'd like to buy: "
+        message: "Enter the Product ID of the product you'd like to buy:"
     })
     .then(function(answer){
         db.query("SELECT item_id AS 'Product ID', product_name AS 'Product Name', CONCAT('$',FORMAT(price,2)) AS 'Price', stock_quantity AS 'Available Qty.' FROM products WHERE item_id="+answer.askID+" ", function(err,res){
@@ -48,7 +48,7 @@ function startBamazon(){
             }
             else
             {
-                console.log('\r\nYour selcted item:'.inverse.green);
+                console.log('\r\nYour selcted item:'.inverse.yellow.underline);
                 console.table(res);
                 orderBamazon(answer.askID);
             };
@@ -93,7 +93,32 @@ function fulfillBamazon(rmgQty,buyQty,itemID){
         if (err) throw err;
         var itemPrice = res[0].price;
         var totalCost = itemPrice * buyQty;
-        console.log("Total cost of your purchase: ".inverse.italic.underline.green +totalCost);
+        console.log("Total cost of your purchase:".inverse.italic.underline.green + totalCost.toLocaleString('en-US',{style:'currency', currency:'USD'}));
     });
-    
+    inquirer
+    .prompt({
+        name: 'askShop',
+        type: 'input',
+        message: 'Would you like to purchase another product?'
+    })
+    .then(function(answer){
+        switch(answer.askShop){
+            case 'y':
+                startBamazon();
+            break;
+            case 'Y':
+                startBamazon();
+            break;
+            case 'n':
+                db.end;
+                process.exit();
+            break;
+            case 'N':
+                db.end;
+                process.exit();
+            break;
+            default:
+                process.exit();
+        }
+    });
 }
