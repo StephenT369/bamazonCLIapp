@@ -21,8 +21,8 @@ db.connect(function(err){
 function showProducts(){
     db.query("SELECT item_id AS 'Product ID', product_name AS 'Product Name', department_name AS 'Department', CONCAT('$',FORMAT(price,2)) AS 'Price', stock_quantity AS 'Available Qty.' FROM products WHERE stock_quantity > 0 ", function(err,res){
         if (err) throw err;
-        
-        console.log('\r\n\n\n***WELCOME TO bAMAzON!****'.rainbow + '\r\n');
+        clear();
+        console.log('\r\n***WELCOME TO bAMAzON!****'.rainbow + '\r\n');
         console.log('\r\nAvailable Products for Purchase:'.inverse.cyan.underline+'\r\n');
         console.table(res);
         startBamazon();
@@ -35,9 +35,14 @@ function startBamazon(){
     .prompt({
         name: 'askID',
         type: 'input',
-        message: "Enter the Product ID of the product you'd like to buy:"
+        message: "Enter the Product ID of the product you'd like to buy, type EXIT to quit:"
     })
     .then(function(answer){
+        if (answer.askID === 'EXIT'){
+            db.end;
+            clear();
+            process.exit();
+        };
         db.query("SELECT item_id AS 'Product ID', product_name AS 'Product Name', CONCAT('$',FORMAT(price,2)) AS 'Price', stock_quantity AS 'Available Qty.' FROM products WHERE item_id="+answer.askID+" ", function(err,res){
             if (err) throw err;
             if (!res.length){
@@ -74,7 +79,6 @@ inquirer
             orderBamazon(itemID);
         } else if (selQty === 0){
             console.log('Enter a number greater than zero (0)!'.inverse.red.underline);
-            clear();
             orderBamazon(itemID);
         } else if (selQty <= qtyVal ) {
             updQty = qtyVal - selQty;
@@ -103,14 +107,16 @@ function fulfillBamazon(rmgQty,buyQty,itemID){
     .prompt({
         name: 'askShop',
         type: 'input',
-        message: 'Would you like to purchase another product?'
+        message: 'Would you like to purchase another product?(y/n)'
     })
     .then(function(answer){
         switch(answer.askShop){
             case 'y':
+                clear();
                 showProducts();
             break;
             case 'Y':
+                clear();
                 showProducts();
             break;
             case 'n':
