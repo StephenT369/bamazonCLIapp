@@ -23,8 +23,9 @@ function showProducts(){
     db.query("SELECT item_id AS 'Product ID', product_name AS 'Product Name', department_name AS 'Department', CONCAT('$',FORMAT(price,2)) AS 'Price', stock_quantity AS 'Available Qty.' FROM products", function(err,res){
         if (err) throw err;
         
-        console.log('\r\n\n\n***WELCOME TO bAMAzON!****'.rainbow + '\r\n' + 'Available Products for Purchase:'.inverse.magenta);
-        
+        console.log('\r\n\n\n***WELCOME TO bAMAzON!****'.rainbow + '\r\n');
+        startBamazon();
+        console.log('\r\nAvailable Products for Purchase:'.inverse.magenta+'\r\n');
         console.table(res);
         
     })
