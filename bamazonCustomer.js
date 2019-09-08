@@ -57,6 +57,7 @@ function startBamazon(){
 };
 
 function orderBamazon(itemID){
+    var updQty;
 inquirer
 .prompt({
     name: 'askQty',
@@ -76,9 +77,23 @@ inquirer
             console.log('Enter a number greater than zero (0)!'.inverse.red.underline);
             orderBamazon(itemID);
         } else if (selQty <= qtyVal ) {
-            console.log('OK finally!');
+            updQty = qtyVal - selQty;
+            fulfillBamazon(updQty,selQty,itemID);
         }
     }) 
    
 })
 };
+
+function fulfillBamazon(rmgQty,buyQty,itemID){
+    db.query("UPDATE products SET stock_quantity="+rmgQty+" WHERE (item_id="+itemID+")", function(err,res){
+        if (err) throw err;
+    });
+    db.query("SELECT price FROM products WHERE item_id="+itemID+"", function(err,res){
+        if (err) throw err;
+        var itemPrice = res[0].price;
+        var totalCost = itemPrice * buyQty;
+        console.log("Total cost of your purchase: ".inverse.italic.underline.green +totalCost);
+    });
+    
+}
